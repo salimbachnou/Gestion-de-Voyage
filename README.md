@@ -28,7 +28,7 @@ L'application est développée avec **Spring Boot** pour le backend et une inter
 
 ## Installation
 ### Prérequis
-- JDK 17+
+- JDK 21+
 - Maven
 - MySQL ou PostgreSQL
 
