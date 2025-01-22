@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion des Utilisateurs - Administration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <div th:replace="~{fragments/admin-nav :: nav}"></div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <h1 class="text-3xl font-bold mb-8">Gestion des Utilisateurs</h1>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom d'utilisateur</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rôles</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr th:each="user : ${users}">
+                        <td class="px-6 py-4" th:text="${user.username}">user123</td>
+                        <td class="px-6 py-4" th:text="${user.nom}">John Doe</td>
+                        <td class="px-6 py-4" th:text="${user.email}">john@example.com</td>
+                        <td class="px-6 py-4">
+                            <span th:each="role : ${user.roles}" 
+                                  th:text="${role}"
+                                  class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1">
+                                ROLE_USER
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button th:onclick="'viewDetails(' + ${user.id} + ')'"
+                                    class="text-blue-600 hover:text-blue-900">
+                                Détails
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Détails -->
+    <div id="details-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg mx-auto mt-20 p-6 max-w-2xl">
+            <h2 class="text-2xl font-bold mb-4">Détails de l'utilisateur</h2>
+            <div id="user-details">
+                <!-- Les détails seront injectés ici via JavaScript -->
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="hideModal()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function viewDetails(userId) {
+            fetch(`/admin/users/${userId}`)
+                .then(response => response.json())
+                .then(user => {
+                    const details = document.getElementById('user-details');
+                    details.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="font-bold">Nom d'utilisateur</p>
+                                <p>${user.username}</p>
+                            </div>
+                            <div>
+                                <p class="font-bold">Nom</p>
+                                <p>${user.nom}</p>
+                            </div>
+                            <div>
+                                <p class="font-bold">Email</p>
+                                <p>${user.email}</p>
+                            </div>
+                            <div>
+                                <p class="font-bold">Rôles</p>
+                                <p>${user.roles.join(', ')}</p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('details-modal').classList.remove('hidden');
+                });
+        }
+
+        function hideModal() {
+            document.getElementById('details-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html> 

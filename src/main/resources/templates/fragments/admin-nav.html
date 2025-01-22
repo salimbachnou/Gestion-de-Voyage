@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <nav th:fragment="nav" class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-xl font-bold">Admin Panel</div>
+                <div class="space-x-4">
+                    <a href="/admin" class="hover:text-gray-300" th:classappend="${currentPage == 'dashboard' ? 'text-blue-400' : ''}">Dashboard</a>
+                    <a href="/admin/voyages" class="hover:text-gray-300" th:classappend="${currentPage == 'voyages' ? 'text-blue-400' : ''}">Voyages</a>
+                    <a href="/admin/reservations" class="hover:text-gray-300" th:classappend="${currentPage == 'reservations' ? 'text-blue-400' : ''}">Réservations</a>
+                    <a href="/admin/paiements" class="hover:text-gray-300" th:classappend="${currentPage == 'paiements' ? 'text-blue-400' : ''}">Paiements</a>
+                    <a href="/admin/users" class="hover:text-gray-300" th:classappend="${currentPage == 'users' ? 'text-blue-400' : ''}">Utilisateurs</a>
+                    <form th:action="@{/logout}" method="post" class="inline">
+                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                            Déconnexion
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+</html> 

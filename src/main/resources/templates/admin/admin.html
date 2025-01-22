@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administration - Voyages</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 text-white">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="text-xl font-bold">Admin Panel</div>
+          <div class="space-x-4">
+            <a href="/admin/voyages" class="hover:text-gray-300">Voyages</a>
+            <a href="/admin/users" class="hover:text-gray-300">Utilisateurs</a>
+            <form th:action="@{/logout}" method="post" class="inline">
+              <button
+                type="submit"
+                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Déconnexion
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Gestion des Voyages</h1>
+        <button
+          onclick="showAddModal()"
+          class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+        >
+          Ajouter un voyage
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-lg shadow overflow-x-auto">
+        <table class="min-w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Destination
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Type
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Prix
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Places
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="voyages-table-body"
+            class="bg-white divide-y divide-gray-200"
+          >
+            <!-- Les voyages seront injectés ici -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal d'ajout/modification -->
+    <div
+      id="voyage-modal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden"
+    >
+      <div class="bg-white rounded-lg mx-auto mt-20 p-6 max-w-2xl">
+        <h2 id="modal-title" class="text-2xl font-bold mb-4">
+          Ajouter un voyage
+        </h2>
+        <form id="voyage-form" onsubmit="handleSubmit(event)">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2">Destination</label>
+              <input
+                type="text"
+                name="destination"
+                class="w-full border rounded p-2"
+              />
+            </div>
+            <div>
+              <label class="block mb-2">Type de voyage</label>
+              <select name="typeVoyage" class="w-full border rounded p-2">
+                <option value="Circuit">Circuit</option>
+                <option value="Séjour">Séjour</option>
+                <option value="Croisière">Croisière</option>
+              </select>
+            </div>
+            <div>
+              <label class="block mb-2">Prix</label>
+              <input
+                type="number"
+                name="prix"
+                class="w-full border rounded p-2"
+              />
+            </div>
+            <div>
+              <label class="block mb-2">Nombre de places</label>
+              <input
+                type="number"
+                name="nombrePlaces"
+                class="w-full border rounded p-2"
+              />
+            </div>
+            <div class="col-span-2">
+              <label class="block mb-2">Description</label>
+              <textarea
+                name="description"
+                class="w-full border rounded p-2"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+          <div class="flex justify-end mt-4 space-x-2">
+            <button
+              type="button"
+              onclick="hideModal()"
+              class="px-4 py-2 border rounded"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+  <script>
+    // Charger les voyages
+    function loadVoyages() {
+      fetch("/api/voyages")
+        .then((response) => response.json())
+        .then((voyages) => {
+          const tbody = document.getElementById("voyages-table-body");
+          tbody.innerHTML = "";
+          voyages.forEach((voyage) => {
+            tbody.innerHTML += `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">${voyage.destination}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${voyage.typeVoyage}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${voyage.prix}€</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${voyage.nombrePlaces}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <button onclick="editVoyage(${voyage.id})" class="text-blue-600 hover:text-blue-900 mr-2">
+                                    Modifier
+                                </button>
+                                <button onclick="deleteVoyage(${voyage.id})" class="text-red-600 hover:text-red-900">
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+          });
+        });
+    }
+
+    // Fonctions pour le modal
+    function showAddModal() {
+      document.getElementById("voyage-modal").classList.remove("hidden");
+    }
+
+    function hideModal() {
+      document.getElementById("voyage-modal").classList.add("hidden");
+    }
+
+    // Gérer le formulaire
+    function handleSubmit(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const voyage = Object.fromEntries(formData.entries());
+
+      fetch("/api/voyages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(voyage),
+      })
+        .then((response) => response.json())
+        .then(() => {
+          hideModal();
+          loadVoyages();
+        });
+    }
+
+    // Charger les voyages au démarrage
+    loadVoyages();
+  </script>
+</html>

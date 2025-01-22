@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layouts/base-layout :: html(content=~{::main}, title=~{::title})}"
+>
+  <head>
+    <title>Mes Réservations</title>
+  </head>
+  <body>
+    <main>
+    <div layout:fragment="content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <!-- En-tête -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Mes Réservations</h1>
+        <p class="mt-2 text-sm text-gray-600">Gérez vos réservations de voyage et suivez leur statut</p>
+      </div>
+
+      <!-- Messages de succès/erreur -->
+      <div
+        th:if="${success}"
+        class="mb-6 rounded-lg bg-green-50 p-4 text-sm text-green-700 flex items-center"
+        role="alert"
+      >
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <span th:text="${success}"></span>
+      </div>
+      <div
+        th:if="${error}"
+        class="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-700 flex items-center"
+        role="alert"
+      >
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span th:text="${error}"></span>
+      </div>
+
+      <!-- Liste des réservations -->
+      <div class="space-y-6">
+        <div
+          th:each="reservation : ${reservations}"
+          class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300"
+        >
+          <div class="p-6">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="flex items-center mb-2">
+                  <h2
+                    class="text-xl font-bold text-gray-900"
+                    th:text="${reservation.voyage.destination}"
+                  >
+                    Destination
+                  </h2>
+                  <span
+                    class="ml-4 px-2.5 py-0.5 rounded-full text-sm font-medium"
+                    th:with="statut=${reservation.statut}"
+                    th:class="${statut == 'CONFIRMEE' ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20' : 
+                             (statut == 'EN_ATTENTE' ? 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20' : 
+                             'bg-red-50 text-red-700 ring-1 ring-red-600/20')}"
+                    th:text="${reservation.statut}"
+                  >
+                    Statut
+                  </span>
+                </div>
+                
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Date de départ</p>
+                    <p class="mt-1 text-gray-900">
+                      <i class="fas fa-calendar-alt mr-2 text-gray-400"></i>
+                      <span th:text="${#dates.format(reservation.voyage.dateDepart, 'dd/MM/yyyy')}"></span>
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Durée</p>
+                    <p class="mt-1 text-gray-900">
+                      <i class="fas fa-clock mr-2 text-gray-400"></i>
+                      <span th:text="${reservation.voyage.duree}"></span> jours
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Voyageurs</p>
+                    <p class="mt-1 text-gray-900">
+                      <i class="fas fa-users mr-2 text-gray-400"></i>
+                      <span th:text="${reservation.nombrePersonnes}"></span> personne(s)
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Prix total</p>
+                    <p class="mt-1 text-gray-900 font-semibold">
+                      <i class="fas fa-euro-sign mr-2 text-gray-400"></i>
+                      <span th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 2, 'POINT')}">0.00</span> €
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="ml-6">
+                <form
+                  th:if="${reservation.statut != T(com.example.firstapp.entities.Reservation.StatutReservation).ANNULEE}"
+                  th:action="@{/reservations/{id}/annuler(id=${reservation.id})}"
+                  method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');"
+                >
+                  <button
+                    type="submit"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+                  >
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message si aucune réservation -->
+      <div 
+        th:if="${#lists.isEmpty(reservations)}" 
+        class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200 mt-6"
+      >
+        <div class="rounded-full bg-gray-100 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-ticket-alt text-2xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          Aucune réservation
+        </h3>
+        <p class="text-gray-500 mb-6">
+          Vous n'avez aucune réservation pour le moment.
+        </p>
+        <a
+          href="/voyages"
+          class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+        >
+          <i class="fas fa-search mr-2"></i>
+          Découvrir nos voyages
+        </a>
+      </div>
+    </div>
+    </main>
+  </body>
+</html>

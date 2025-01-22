@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tableau de bord - Administration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <div th:replace="~{fragments/admin-nav :: nav}"></div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <h1 class="text-3xl font-bold mb-8">Tableau de bord</h1>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Total Voyages -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-500 bg-opacity-20">
+                        <svg class="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l2-2h14l2 2M5 6v14a2 2 0 002 2h10a2 2 0 002-2V6M8 6V4h8v2"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Total Voyages</h2>
+                        <p class="text-2xl font-semibold text-gray-700" th:text="${totalVoyages}">40</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Réservations -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-500 bg-opacity-20">
+                        <svg class="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Total Réservations</h2>
+                        <p class="text-2xl font-semibold text-gray-700" >16</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenus -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-500 bg-opacity-20">
+                        <svg class="h-8 w-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Revenus Totaux</h2>
+                        <p class="text-2xl font-semibold text-gray-700">
+                            <span >12400.00</span> MAD
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Utilisateurs -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-500 bg-opacity-20">
+                        <svg class="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Total Utilisateurs</h2>
+                        <p class="text-2xl font-semibold text-gray-700" th:text="${totalUsers}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers voyages -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b">
+                <h3 class="text-xl font-semibold">Derniers voyages ajoutés</h3>
+            </div>
+            <div class="p-6">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Places</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr th:each="voyage : ${recentVoyages}">
+                            <td class="py-4" th:text="${voyage.destination}">Paris</td>
+                            <td class="py-4" th:text="${voyage.typeVoyage}">Séjour</td>
+                            <td class="py-4" th:text="${voyage.prix + ' MAD'}">899.99 MAD</td>
+                            <td class="py-4" th:text="${voyage.nombrePlaces}">20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html
+  th:replace="~{layouts/base-layout :: html(content=~{::main}, title=~{::title})}"
+>
+  <head>
+    <title>Nos Voyages - VoyagesApp</title>
+  </head>
+  <body>
+    <main>
+      <div class="container mx-auto px-6 py-8">
+        <h1 class="text-3xl font-bold mb-8">Découvrez nos voyages</h1>
+
+        <!-- Results -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Voyage Card -->
+          <div
+            th:each="voyage : ${voyages}"
+            class="bg-white rounded-lg shadow-lg overflow-hidden"
+          >
+            <div class="relative h-48">
+              <img
+                th:if="${voyage.photoUrl != null and !voyage.photoUrl.isEmpty()}"
+                th:src="${voyage.photoUrl}"
+                th:alt="${voyage.destination}"
+                class="w-full h-full object-cover"
+              />
+              <img
+                th:if="${(voyage.photoUrl == null or voyage.photoUrl.isEmpty()) and voyage.image != null and !voyage.image.isEmpty()}"
+                th:src="${voyage.image}"
+                th:alt="${voyage.destination}"
+                class="w-full h-full object-cover"
+              />
+              <div
+                th:if="${(voyage.photoUrl == null or voyage.photoUrl.isEmpty()) and (voyage.image == null or voyage.image.isEmpty())}"
+                class="w-full h-full bg-gray-200 flex items-center justify-center"
+              >
+                <span class="text-gray-400 text-lg"
+                  >[[${voyage.destination}]]</span
+                >
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold" th:text="${voyage.destination}">
+                  Paris
+                </h3>
+                <span
+                  class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded"
+                  th:text="${voyage.typeVoyage}"
+                >
+                  Type
+                </span>
+              </div>
+              <p class="text-gray-600 mb-4" th:text="${voyage.description}">
+                Description...
+              </p>
+              <div class="flex justify-between items-center">
+                <div>
+                  <span
+                    class="text-2xl font-bold text-blue-600"
+                    th:text="${voyage.prix + ' MAD'}"
+                    >199 MAD</span
+                  >
+                  <span class="text-sm text-gray-500">/personne</span>
+                </div>
+                <a
+                  th:href="@{/voyages/{id}(id=${voyage.id})}"
+                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                  détails
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

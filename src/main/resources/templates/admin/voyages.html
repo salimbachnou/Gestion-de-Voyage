@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion des Voyages - Administration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <div th:replace="~{fragments/admin-nav :: nav}"></div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Gestion des Voyages</h1>
+            <button onclick="showAddModal()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                Ajouter un voyage
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destination</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dates</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Places</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="voyages-table-body" class="divide-y divide-gray-200">
+                    <!-- Les voyages seront injectés ici via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Formulaire -->
+    <div id="voyage-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg mx-auto mt-20 p-6 max-w-2xl">
+            <h2 id="modal-title" class="text-2xl font-bold mb-4">Ajouter un voyage</h2>
+            <form id="voyage-form" onsubmit="handleSubmit(event)">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2">Destination</label>
+                        <input type="text" name="destination" class="w-full border rounded p-2" required>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Type de voyage</label>
+                        <select name="typeVoyage" class="w-full border rounded p-2" required>
+                            <option value="Circuit">Circuit</option>
+                            <option value="Séjour">Séjour</option>
+                            <option value="Croisière">Croisière</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Date de départ</label>
+                        <input type="date" name="dateDepart" class="w-full border rounded p-2" required>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Date de retour</label>
+                        <input type="date" name="dateRetour" class="w-full border rounded p-2" required>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Prix</label>
+                        <input type="number" name="prix" class="w-full border rounded p-2" required>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Nombre de places</label>
+                        <input type="number" name="nombrePlaces" class="w-full border rounded p-2" required>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block mb-2">Description</label>
+                        <textarea name="description" class="w-full border rounded p-2" rows="3" required></textarea>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block mb-2">URL de la photo</label>
+                        <input type="url" name="photoUrl" class="w-full border rounded p-2">
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4 space-x-2">
+                    <button type="button" onclick="hideModal()" class="px-4 py-2 border rounded">
+                        Annuler
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let editingId = null;
+
+        function loadVoyages() {
+            fetch('/api/voyages')
+                .then(response => response.json())
+                .then(voyages => {
+                    const tbody = document.getElementById('voyages-table-body');
+                    tbody.innerHTML = voyages.map(voyage => `
+                        <tr>
+                            <td class="px-6 py-4">${voyage.destination}</td>
+                            <td class="px-6 py-4">${new Date(voyage.dateDepart).toLocaleDateString()}</td>
+                            <td class="px-6 py-4">${voyage.prix} MAD</td>
+                            <td class="px-6 py-4">${voyage.nombrePlaces}</td>
+                            <td class="px-6 py-4">
+                                <button onclick="editVoyage(${voyage.id})" class="text-blue-600 hover:text-blue-900 mr-2">
+                                    Modifier
+                                </button>
+                                <button onclick="deleteVoyage(${voyage.id})" class="text-red-600 hover:text-red-900">
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function showAddModal() {
+            editingId = null;
+            document.getElementById('modal-title').textContent = 'Ajouter un voyage';
+            document.getElementById('voyage-form').reset();
+            document.getElementById('voyage-modal').classList.remove('hidden');
+        }
+
+        function hideModal() {
+            document.getElementById('voyage-modal').classList.add('hidden');
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const voyage = Object.fromEntries(formData.entries());
+
+            const url = editingId ? `/api/voyages/${editingId}` : '/api/voyages';
+            const method = editingId ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(voyage)
+            })
+            .then(response => response.json())
+            .then(() => {
+                hideModal();
+                loadVoyages();
+            });
+        }
+
+        function editVoyage(id) {
+            editingId = id;
+            fetch(`/api/voyages/${id}`)
+                .then(response => response.json())
+                .then(voyage => {
+                    document.getElementById('modal-title').textContent = 'Modifier le voyage';
+                    const form = document.getElementById('voyage-form');
+                    Object.keys(voyage).forEach(key => {
+                        const input = form.elements[key];
+                        if (input) {
+                            if (key === 'dateDepart' || key === 'dateRetour') {
+                                input.value = new Date(voyage[key]).toISOString().split('T')[0];
+                            } else {
+                                input.value = voyage[key];
+                            }
+                        }
+                    });
+                    document.getElementById('voyage-modal').classList.remove('hidden');
+                });
+        }
+
+        function deleteVoyage(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce voyage ?')) {
+                fetch(`/api/voyages/${id}`, {
+                    method: 'DELETE'
+                }).then(() => loadVoyages());
+            }
+        }
+
+        // Charger les voyages au démarrage
+        loadVoyages();
+    </script>
+</body>
+</html> 

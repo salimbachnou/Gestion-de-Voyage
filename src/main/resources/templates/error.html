@@ -1,0 +1,22 @@
+<!-- src/main/resources/templates/error.html -->
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur - Agence de Voyages</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-md w-96 text-center">
+            <h2 class="text-2xl font-bold mb-4 text-red-600">Erreur d'accès</h2>
+            <p class="text-gray-600 mb-6">Vous n'avez pas les permissions nécessaires pour accéder à cette page.</p>
+            <div class="space-x-4">
+                <a href="/" class="text-blue-600 hover:text-blue-800">Retour à l'accueil</a>
+                <a href="/login1" class="text-blue-600 hover:text-blue-800">Se connecter</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
